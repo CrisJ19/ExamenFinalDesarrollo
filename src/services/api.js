@@ -1,43 +1,42 @@
-// api.js — API simulada local
+const API_URL = "https://6933ba294090fe3bf01dd856.mockapi.io/productos";
 
-import { gymProducts } from "../data/gymProducts.js";
-
-let products = [...gymProducts];
-
-// Obtener TODOS los productos
+// Obtener todos los productos
 export async function getProducts() {
-  return Promise.resolve(products);
+  const res = await fetch(API_URL);
+  return await res.json();
 }
 
-
+// Obtener un producto
 export async function getProduct(id) {
-  return Promise.resolve(products.find((p) => p.id === id));
+  const res = await fetch(`${API_URL}/${id}`);
+  return await res.json();
 }
 
-
+// Crear un producto
 export async function createProduct(product) {
-  const newProduct = {
-    ...product,
-    id: Date.now(),
-  };
-
-  products.push(newProduct);
-
-  return Promise.resolve(newProduct);
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(product),
+  });
+  return await res.json();
 }
 
-
+// Actualizar un producto
 export async function updateProduct(id, updated) {
-  const index = products.findIndex((p) => p.id === id);
-  if (index !== -1) {
-    products[index] = { ...products[index], ...updated };
-  }
-
-  return Promise.resolve(products[index]);
+  const res = await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updated),
+  });
+  return await res.json();
 }
 
-
+// Eliminar un producto
 export async function deleteProduct(id) {
-  products = products.filter((p) => p.id !== id);
-  return Promise.resolve({ success: true });
+  const res = await fetch(`${API_URL}/${id}`, {
+    method: "DELETE"
+  });
+  return await res.json();
 }
+
