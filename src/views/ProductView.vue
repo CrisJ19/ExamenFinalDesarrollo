@@ -1,112 +1,137 @@
 <template>
-  <div>
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3 class="gradient-title mb-0">Productos</h3>
+  <div class="container mt-4">
 
-      <button class="btn btn-primary-wicho" @click="nuevoProducto">
-        + Nuevo Producto
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>Productos</h2>
+      <button class="btn btn-primary" @click="nuevoProducto">
+        Nuevo Producto
       </button>
     </div>
 
-    <!-- Loading -->
-    <LoadingSpinner v-if="loading" />
-
-    <!-- Lista de productos -->
-    <div class="row g-3" v-else>
+    <div class="row">
       <div
-        class="col-12 col-sm-6 col-md-4 col-lg-3"
+        class="col-md-4 mb-3"
         v-for="p in productos"
         :key="p.id"
       >
-        <ProductCardComponent
-          :product="p"
-          @view="abrirProducto"
-          @addToCart="añadirCarrito"
-          @delete="eliminarProducto"
-        />
+        <div class="card shadow-sm">
+
+          <!-- Imagen del producto -->
+          <img
+            :src="p.image || 'https://via.placeholder.com/300x200?text=Sin+Imagen'"
+            class="card-img-top"
+            style="height: 200px; object-fit: cover;"
+          />
+
+          <div class="card-body">
+            <h5 class="card-title">{{ p.title }}</h5>
+
+            <p class="card-text">
+              {{ p.description }}
+            </p>
+
+            <p><strong>${{ p.price }}</strong></p>
+
+            <div class="d-flex justify-content-between">
+              <button
+                class="btn btn-warning btn-sm"
+                @click="editarProducto(p)"
+              >
+                Editar
+              </button>
+
+              <button
+                class="btn btn-danger btn-sm"
+                @click="eliminarProducto(p.id)"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
 
+    <!-- Modal -->
     <ProductModal
-      ref="modal"
-      :product="productoSeleccionado"
+      ref="productoModal"
+      :product="productoEdit"
       @save="guardarProducto"
     />
+
   </div>
 </template>
 
 <script>
+import ProductModal from "../components/ProductModal.vue";
+
 import {
   getProducts,
   createProduct,
   updateProduct,
   deleteProduct,
-} from "../services/api.js";
-
-import ProductCardComponent from "../components/ProductCardComponent.vue";
-import ProductModal from "../components/ProductModal.vue";
-import LoadingSpinner from "../components/LoadingSpinner.vue";
+} from "../services/productsService.js";
 
 export default {
-  components: { ProductCardComponent, ProductModal, LoadingSpinner },
+  components: { ProductModal },
 
   data() {
     return {
       productos: [],
-      loading: true,
-      productoSeleccionado: null,
+      productoEdit: null,
     };
   },
 
   async mounted() {
-    await this.cargarProductos();
+    this.cargarProductos();
   },
 
   methods: {
-    // Cargar productos desde API local simulada
     async cargarProductos() {
-      this.loading = true;
-      this.productos = await getProducts();
-      this.loading = false;
-    },
-
-    abrirProducto(p) {
-      this.productoSeleccionado = { ...p }; // evitar mutación directa
-      this.$refs.modal.show();
+      try {
+        this.productos = await getProducts();
+      } catch (e) {
+        console.error("Error cargando productos:", e);
+      }
     },
 
     nuevoProducto() {
-      this.productoSeleccionado = null;
-      this.$refs.modal.show();
+      this.productoEdit = null;
+      this.$refs.productoModal.show();
+    },
+
+    editarProducto(prod) {
+      this.productoEdit = { ...prod }; // evitar modificar reactivo original
+      this.$refs.productoModal.show();
+    },
+
+    async eliminarProducto(id) {
+      if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
+
+      await deleteProduct(id);
+      this.cargarProductos();
     },
 
     async guardarProducto(data) {
-      if (this.productoSeleccionado) {
-        // EDITAR
-        await updateProduct(this.productoSeleccionado.id, data);
+      const cleanProduct = {
+        title: data.title,
+        description: data.description,
+        price: Number(data.price),
+        category: data.category,
+        image: data.image,
+        stock: Number(data.stock),
+        status: data.status,
+      };
+
+      if (this.productoEdit) {
+        await updateProduct(this.productoEdit.id, cleanProduct);
       } else {
-        // CREAR
-        await createProduct(data);
+        await createProduct(cleanProduct);
       }
-      await this.cargarProductos();
-    },
 
-    async eliminarProducto(producto) {
-      if (!confirm(`¿Seguro que deseas eliminar "${producto.title}"?`)) return;
-
-      await deleteProduct(producto.id);
-      await this.cargarProductos();
-    },
-
-    añadirCarrito(p) {
-      console.log("Añadido al carrito:", p);
+      this.cargarProductos();
     },
   },
 };
 </script>
-
-<style scoped>
-.row {
-  margin-top: 20px;
-}
-</style>

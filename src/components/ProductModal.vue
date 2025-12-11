@@ -1,47 +1,69 @@
 <template>
-  <div class="modal fade" tabindex="-1" ref="modalElement">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal fade" tabindex="-1" ref="modalRef">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
 
-        <!-- Header -->
         <div class="modal-header">
           <h5 class="modal-title">
-            {{ product ? "Editar Producto" : "Nuevo Producto" }}
+            {{ isEdit ? "Editar Producto" : "Nuevo Producto" }}
           </h5>
-          <button type="button" class="btn-close" @click="hide"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
 
-        <!-- Body -->
         <div class="modal-body">
-          <form @submit.prevent="guardar">
 
+          <form>
+            <!-- Título -->
             <div class="mb-3">
-              <label class="form-label">Nombre</label>
-              <input v-model="form.title" type="text" class="form-control" required />
+              <label class="form-label">Título:</label>
+              <input v-model="form.title" type="text" class="form-control" />
             </div>
 
+            <!-- Descripción -->
             <div class="mb-3">
-              <label class="form-label">Precio</label>
-              <input v-model.number="form.price" type="number" min="1" step="0.01" class="form-control" required />
+              <label class="form-label">Descripción:</label>
+              <textarea v-model="form.description" class="form-control" rows="3"></textarea>
             </div>
 
+            <!-- Precio -->
             <div class="mb-3">
-              <label class="form-label">Descripción</label>
-              <textarea v-model="form.description" class="form-control" rows="3" required></textarea>
+              <label class="form-label">Precio:</label>
+              <input v-model.number="form.price" type="number" class="form-control" />
             </div>
 
+            <!-- Categoría -->
             <div class="mb-3">
-              <label class="form-label">Imagen (URL)</label>
-              <input v-model="form.image" type="text" class="form-control" placeholder="https://ruta.com/imagen.jpg" />
-              <small class="text-muted">Si no ingresas una imagen válida, se usará la imagen por defecto.</small>
+              <label class="form-label">Categoría:</label>
+              <input v-model="form.category" type="text" class="form-control" />
+            </div>
+
+            <!-- Imagen -->
+            <div class="mb-3">
+              <label class="form-label">URL Imagen:</label>
+              <input v-model="form.image" type="text" class="form-control" />
+            </div>
+
+            <!-- Stock -->
+            <div class="mb-3">
+              <label class="form-label">Stock:</label>
+              <input v-model.number="form.stock" type="number" class="form-control" />
+            </div>
+
+            <!-- Estado -->
+            <div class="mb-3">
+              <label class="form-label">Estado:</label>
+              <select v-model="form.status" class="form-select">
+                <option value="Disponible">Disponible</option>
+                <option value="Agotado">Agotado</option>
+              </select>
             </div>
 
           </form>
+
         </div>
 
-        <!-- Footer -->
         <div class="modal-footer">
-          <button class="btn btn-secondary" @click="hide">Cancelar</button>
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
           <button class="btn btn-primary" @click="guardar">Guardar</button>
         </div>
 
@@ -55,38 +77,54 @@ import { Modal } from "bootstrap";
 
 export default {
   props: {
-    product: { type: Object, default: null },
+    product: { type: Object, default: null }
   },
 
   data() {
     return {
       modal: null,
+
       form: {
         title: "",
-        price: "",
         description: "",
+        price: 0,
+        category: "",
         image: "",
+        stock: 0,
+        status: "Disponible",
       },
     };
+  },
+
+  computed: {
+    isEdit() {
+      return !!this.product;
+    },
   },
 
   watch: {
     product: {
       immediate: true,
-      handler(newVal) {
-        if (newVal) {
+      handler(val) {
+        if (val) {
           this.form = {
-            title: newVal.title || "",
-            price: newVal.price || "",
-            description: newVal.description || "",
-            image: newVal.image || "",
+            title: val.title ?? "",
+            description: val.description ?? "",
+            price: val.price ?? 0,
+            category: val.category ?? "",
+            image: val.image ?? "",
+            stock: val.stock ?? 0,
+            status: val.status ?? "Disponible",
           };
         } else {
           this.form = {
             title: "",
-            price: "",
             description: "",
+            price: 0,
+            category: "",
             image: "",
+            stock: 0,
+            status: "Disponible",
           };
         }
       },
@@ -94,25 +132,22 @@ export default {
   },
 
   mounted() {
-    this.modal = new Modal(this.$refs.modalElement);
+    this.modal = new Modal(this.$refs.modalRef);
   },
 
   methods: {
     show() {
       this.modal.show();
     },
+
     hide() {
       this.modal.hide();
     },
 
     guardar() {
-      if (!this.form.title || !this.form.price || !this.form.description) {
-        alert("Todos los campos son obligatorios");
+      if (!this.form.title || !this.form.price) {
+        alert("El título y el precio son obligatorios");
         return;
-      }
-
-      if (!this.form.image) {
-        this.form.image = "/no-image.png"; // fallback automático
       }
 
       this.$emit("save", { ...this.form });
@@ -127,3 +162,4 @@ export default {
   border-radius: 12px;
 }
 </style>
+
