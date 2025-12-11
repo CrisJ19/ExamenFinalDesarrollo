@@ -4,7 +4,7 @@ import { gymProducts } from "../data/gymProducts.js";
 
 let products = [...gymProducts];
 
-
+// Obtener TODOS los productos
 export async function getProducts() {
   return Promise.resolve(products);
 }
