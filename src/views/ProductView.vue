@@ -16,7 +16,7 @@
       >
         <div class="card shadow-sm">
 
-          <!-- Imagen -->
+          <!-- Imagen del producto -->
           <img
             :src="p.image || 'https://via.placeholder.com/300x200?text=Sin+Imagen'"
             class="card-img-top"
@@ -84,7 +84,7 @@ export default {
   },
 
   async mounted() {
-    await this.cargarProductos();
+    this.cargarProductos();
   },
 
   methods: {
@@ -102,7 +102,7 @@ export default {
     },
 
     editarProducto(prod) {
-      this.productoEdit = { ...prod }; // Clonamos para evitar mutaciones
+      this.productoEdit = { ...prod }; // evitar modificar reactivo original
       this.$refs.productoModal.show();
     },
 
@@ -110,7 +110,7 @@ export default {
       if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
 
       await deleteProduct(id);
-      await this.cargarProductos();
+      this.cargarProductos();
     },
 
     async guardarProducto(data) {
@@ -118,7 +118,10 @@ export default {
         title: data.title,
         description: data.description,
         price: Number(data.price),
+        category: data.category,
         image: data.image,
+        stock: Number(data.stock),
+        status: data.status,
       };
 
       if (this.productoEdit) {
@@ -127,19 +130,8 @@ export default {
         await createProduct(cleanProduct);
       }
 
-      await this.cargarProductos();
+      this.cargarProductos();
     },
   },
 };
 </script>
-
-<style scoped>
-.card {
-  border-radius: 10px;
-}
-
-.card-img-top {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-</style>
