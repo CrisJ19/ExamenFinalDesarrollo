@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import LoginView from "../views/LoginView.vue";
 import DashboardView from "../views/DashboardView.vue";
 import UsersView from "../views/UsersView.vue";
-import ProductsView from "../views/ProductView.vue"; // ← CORREGIDO
+import ProductsView from "../views/ProductView.vue"; // ← NOMBRE CORREGIDO
 
 const routes = [
   {
@@ -30,7 +30,7 @@ const routes = [
   },
   {
     path: "/:pathMatch(.*)*",
-    redirect: "/login"
+    redirect: "/login",
   }
 ];
 
@@ -39,11 +39,14 @@ const router = createRouter({
   routes,
 });
 
+// 🔐 Middleware de autenticación
 router.beforeEach((to, from, next) => {
   const user = sessionStorage.getItem("wichofit_user");
 
+  // Rutas protegidas
   if (to.meta.requiresAuth && !user) return next("/login");
 
+  // Si ya está logeado y entra a login → dashboard
   if (user && to.path === "/login") return next("/dashboard");
 
   next();

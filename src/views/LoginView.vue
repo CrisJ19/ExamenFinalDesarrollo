@@ -9,7 +9,9 @@
             <p class="login-subtitle">Accede al panel de administración</p>
           </div>
 
-          <div v-if="alert" class="alert alert-danger" role="alert">{{ alert }}</div>
+          <div v-if="alert" class="alert alert-danger" role="alert">
+            {{ alert }}
+          </div>
 
           <div>
             <label class="form-label">Usuario</label>
@@ -28,7 +30,9 @@
             />
 
             <div class="d-grid">
-              <button class="btn btn-primary-wicho" @click="login">Ingresar</button>
+              <button class="btn btn-primary-wicho" @click="login">
+                Ingresar
+              </button>
             </div>
           </div>
         </div>
@@ -38,34 +42,35 @@
 </template>
 
 <script>
+import { loginUser } from "../services/authService.js";
+
 export default {
   data() {
     return {
-      form: { username: '', password: '' },
+      form: { username: "", password: "" },
       alert: null,
-    }
+    };
   },
   methods: {
     async login() {
-      this.alert = null
+      this.alert = null;
+
       try {
-        const res = await fetch('/usuarios.json')
-        const users = await res.json()
-        const found = users.find(
-          (u) => u.username === this.form.username && u.password === this.form.password
-        )
-        if (found) {
-          sessionStorage.setItem('wichofit_user', JSON.stringify(found))
-          this.$router.push('/dashboard')
-        } else {
-          this.alert = 'Usuario o contraseña incorrectos'
+        const user = await loginUser(this.form.username, this.form.password);
+
+        if (!user) {
+          this.alert = "Usuario o contraseña incorrectos";
+          return;
         }
-      } catch (e) {
-        this.alert = 'Error al leer usuarios. Revisa que usuarios.json exista.'
+
+        sessionStorage.setItem("wichofit_user", JSON.stringify(user));
+        this.$router.push("/dashboard");
+      } catch (error) {
+        this.alert = "Error al iniciar sesión. Intenta más tarde.";
       }
     },
   },
-}
+};
 </script>
 
 <style scoped>
@@ -102,14 +107,12 @@ export default {
   color: #fff;
 }
 
-/* Título principal */
 .gradient-title {
   color: #fff !important;
   font-weight: 600;
   letter-spacing: 1px;
 }
 
-/* Card mejorada */
 .card-wicho {
   background: rgba(25, 28, 34, 0.55);
   backdrop-filter: blur(20px);
