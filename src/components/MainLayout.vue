@@ -16,14 +16,16 @@
 
       <!-- Overlay para cerrar sidebar en móvil -->
       <div
-        v-if="sidebarVisible"
+        v-if="sidebarVisible && isMobile"
         class="sidebar-overlay"
         @click="sidebarVisible = false"
       ></div>
 
       <!-- Contenido principal -->
-      <main class="main-content">
-        <router-view />
+      <main :class="['main-content', { 'sidebar-open': sidebarVisible && !isMobile }]">
+        <div class="content-wrapper">
+          <router-view />
+        </div>
         <FooterComponent />
       </main>
     </div>
@@ -44,8 +46,9 @@ export default {
 
   data() {
     return {
-      sidebarVisible: window.innerWidth > 768, // Abierto en desktop por defecto
-      isAuthenticated: false
+      sidebarVisible: false,
+      isAuthenticated: false,
+      isMobile: window.innerWidth <= 768
     };
   },
 
@@ -65,11 +68,7 @@ export default {
     },
 
     handleResize() {
-      if (window.innerWidth > 768) {
-        this.sidebarVisible = true;
-      } else {
-        this.sidebarVisible = false;
-      }
+      this.isMobile = window.innerWidth <= 768;
     },
 
     generateReport() {
@@ -84,6 +83,7 @@ export default {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #f8f9fa;
 }
 
 .layout-container {
@@ -95,26 +95,29 @@ export default {
 
 .main-content {
   flex: 1;
-  padding: 20px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 70px);
   transition: margin-left 0.3s ease;
+  margin-left: 0;
 }
 
-/* Sidebar visible en desktop */
-@media (min-width: 769px) {
-  .main-content {
-    margin-left: 250px;
-  }
+.main-content.sidebar-open {
+  margin-left: 250px;
 }
 
-/* Overlay para móvil */
+.content-wrapper {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .sidebar-overlay {
-  display: none;
   position: fixed;
-  top: 0;
+  top: 70px;
   left: 0;
   width: 100%;
   height: 100%;
@@ -123,12 +126,12 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .sidebar-overlay {
-    display: block;
+  .main-content {
+    margin-left: 0 !important;
   }
 
-  .main-content {
-    margin-left: 0;
+  .content-wrapper {
+    padding: 1rem;
   }
 }
 </style>

@@ -3,6 +3,7 @@ import LoginView from "../views/LoginView.vue";
 import DashboardView from "../views/DashboardView.vue";
 import UsersView from "../views/UsersView.vue";
 import ProductsView from "../views/ProductView.vue";
+import MainLayout from "../components/MainLayout.vue";
 
 const routes = [
   {
@@ -15,22 +16,27 @@ const routes = [
     component: LoginView,
   },
   {
-    path: "/dashboard",
-    name: "dashboard",
-    component: DashboardView,
+    // Todas las rutas protegidas usan el MainLayout
+    path: "/",
+    component: MainLayout,
     meta: { requiresAuth: true },
-  },
-  {
-    path: "/usuarios",
-    name: "usuarios",
-    component: UsersView,
-    meta: { requiresAuth: true },
-  },
-  {
-    path: "/productos",
-    name: "productos",
-    component: ProductsView,
-    meta: { requiresAuth: true },
+    children: [
+      {
+        path: "dashboard",
+        name: "dashboard",
+        component: DashboardView,
+      },
+      {
+        path: "usuarios",
+        name: "usuarios",
+        component: UsersView,
+      },
+      {
+        path: "productos",
+        name: "productos",
+        component: ProductsView,
+      },
+    ]
   },
   {
     path: "/:pathMatch(.*)*",

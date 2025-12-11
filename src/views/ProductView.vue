@@ -1,9 +1,9 @@
 <template>
-  <div class="container mt-4">
+  <div class="productos-view">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
-        <h2 class="mb-0">
+        <h2 class="mb-0 page-title">
           <i class="bi bi-box-seam-fill me-2"></i>Productos
         </h2>
         <small class="text-muted">Gestiona tu inventario de productos</small>
@@ -12,6 +12,13 @@
         <i class="bi bi-plus-circle me-2"></i>
         Nuevo Producto
       </button>
+    </div>
+
+    <!-- Alertas de éxito/error -->
+    <div v-if="alert.show" :class="['alert', alert.type, 'alert-dismissible', 'fade', 'show']" role="alert">
+      <i :class="['bi', alert.icon, 'me-2']"></i>
+      {{ alert.message }}
+      <button type="button" class="btn-close" @click="alert.show = false"></button>
     </div>
 
     <div class="row">
@@ -46,7 +53,7 @@
               </button>
               <button
                 class="btn btn-danger btn-action-product"
-                @click="eliminarProducto(p.id)"
+                @click="confirmDelete(p)"
               >
                 <i class="bi bi-trash-fill me-1"></i>
                 Eliminar
@@ -59,10 +66,20 @@
       </div>
     </div>
 
+    <!-- Modal de Producto -->
     <ProductModal
       ref="productoModal"
       :product="productoEdit"
       @save="guardarProducto"
+    />
+
+    <!-- Modal de Confirmación -->
+    <ConfirmModal
+      v-if="showConfirm"
+      title="Confirmar eliminación"
+      :message="'¿Estás seguro de eliminar ' + (productoToDelete?.title || 'este producto') + '?'"
+      @confirm="deleteProductConfirmed"
+      @close="showConfirm = false"
     />
 
   </div>
@@ -70,6 +87,7 @@
 
 <script>
 import ProductModal from "../components/ProductModal.vue";
+import ConfirmModal from "../components/ConfirmModal.vue";
 
 import {
   getProducts,
@@ -79,12 +97,23 @@ import {
 } from "../services/productsService.js";
 
 export default {
-  components: { ProductModal },
+  components: {
+    ProductModal,
+    ConfirmModal
+  },
 
   data() {
     return {
       productos: [],
       productoEdit: null,
+      showConfirm: false,
+      productoToDelete: null,
+      alert: {
+        show: false,
+        message: "",
+        type: "",
+        icon: ""
+      }
     };
   },
 
@@ -94,7 +123,11 @@ export default {
 
   methods: {
     async cargarProductos() {
-      this.productos = await getProducts();
+      try {
+        this.productos = await getProducts();
+      } catch (error) {
+        this.showAlert("Error al cargar los productos", "alert-danger", "bi-exclamation-triangle-fill");
+      }
     },
 
     nuevoProducto() {
@@ -107,41 +140,89 @@ export default {
       this.$refs.productoModal.show();
     },
 
-    async eliminarProducto(id) {
-      if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
-      await deleteProduct(id);
-      this.cargarProductos();
+    confirmDelete(producto) {
+      this.productoToDelete = producto;
+      this.showConfirm = true;
+    },
+
+    async deleteProductConfirmed() {
+      try {
+        await deleteProduct(this.productoToDelete.id);
+        this.showConfirm = false;
+        this.productoToDelete = null;
+        this.showAlert("Producto eliminado exitosamente", "alert-success", "bi-check-circle-fill");
+        await this.cargarProductos();
+      } catch (error) {
+        this.showAlert("Error al eliminar el producto", "alert-danger", "bi-exclamation-triangle-fill");
+      }
     },
 
     async guardarProducto(data) {
-      const cleanProduct = {
-        title: data.title,
-        description: data.description,
-        price: data.price,
-        category: data.category,
-        image: data.image,
-        stock: data.stock,
-        status: data.status,
+      try {
+        const cleanProduct = {
+          title: data.title,
+          description: data.description,
+          price: data.price,
+          category: data.category,
+          image: data.image,
+          stock: data.stock,
+          status: data.status,
+        };
+
+        if (this.productoEdit) {
+          await updateProduct(this.productoEdit.id, cleanProduct);
+          this.showAlert("Producto actualizado exitosamente", "alert-success", "bi-check-circle-fill");
+        } else {
+          await createProduct(cleanProduct);
+          this.showAlert("Producto creado exitosamente", "alert-success", "bi-check-circle-fill");
+        }
+
+        await this.cargarProductos();
+      } catch (error) {
+        this.showAlert("Error al guardar el producto", "alert-danger", "bi-exclamation-triangle-fill");
+      }
+    },
+
+    showAlert(message, type, icon) {
+      this.alert = {
+        show: true,
+        message,
+        type,
+        icon
       };
 
-      if (this.productoEdit) {
-        await updateProduct(this.productoEdit.id, cleanProduct);
-      } else {
-        await createProduct(cleanProduct);
-      }
-
-      this.cargarProductos();
-    },
+      // Auto-ocultar después de 5 segundos
+      setTimeout(() => {
+        this.alert.show = false;
+      }, 5000);
+    }
   },
 };
 </script>
 
 <style scoped>
+.productos-view {
+  width: 100%;
+}
+
+.page-title {
+  color: #333;
+  font-weight: 700;
+}
+
+.page-title i {
+  background: linear-gradient(90deg, var(--primary-1), var(--primary-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .product-card {
   border-radius: 12px;
   border: 1px solid #e0e0e0;
   transition: all 0.3s ease;
   overflow: hidden;
+  background: white;
 }
 
 .product-card:hover {
@@ -248,5 +329,22 @@ export default {
 
 .product-card {
   animation: fadeInUp 0.5s ease;
+}
+
+.alert {
+  animation: slideDown 0.3s ease-out;
+  border-radius: 8px;
+  border: none;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

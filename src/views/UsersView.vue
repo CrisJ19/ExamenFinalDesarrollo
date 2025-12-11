@@ -1,14 +1,14 @@
 <template>
-  <div class="container py-4">
+  <div class="users-view">
     <!-- Header con título y botón crear -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
-        <h2 class="mb-0">
+        <h2 class="mb-0 page-title">
           <i class="bi bi-people-fill me-2"></i>Gestión de Usuarios
         </h2>
         <small class="text-muted">Administra los usuarios del sistema</small>
       </div>
-      <button class="btn btn-primary" @click="openCreateForm">
+      <button class="btn btn-primary btn-create" @click="openCreateForm">
         <i class="bi bi-plus-circle me-2"></i>Crear Usuario
       </button>
     </div>
@@ -143,8 +143,40 @@ export default {
 </script>
 
 <style scoped>
+.users-view {
+  width: 100%;
+}
+
+.page-title {
+  color: #333;
+  font-weight: 700;
+}
+
+.page-title i {
+  background: linear-gradient(90deg, var(--primary-1), var(--primary-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.btn-create {
+  background: linear-gradient(135deg, var(--primary-1), var(--primary-2));
+  border: none;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(106, 0, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-create:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(106, 0, 255, 0.5);
+}
+
 .alert {
   animation: slideDown 0.3s ease-out;
+  border-radius: 8px;
+  border: none;
 }
 
 @keyframes slideDown {
