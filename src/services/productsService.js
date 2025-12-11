@@ -12,7 +12,7 @@ export async function getProduct(id) {
   return await res.json();
 }
 
-// Crear un producto
+// Crear producto
 export async function createProduct(product) {
   const res = await fetch(API_URL, {
     method: "POST",
@@ -22,7 +22,7 @@ export async function createProduct(product) {
   return await res.json();
 }
 
-// Actualizar un producto
+// Editar producto
 export async function updateProduct(id, updated) {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PUT",
@@ -32,11 +32,9 @@ export async function updateProduct(id, updated) {
   return await res.json();
 }
 
-// Eliminar un producto
+// Eliminar producto
 export async function deleteProduct(id) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
+  const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
   return await res.json();
 }
 

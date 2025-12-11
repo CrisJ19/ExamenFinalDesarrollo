@@ -1,48 +1,64 @@
 <template>
-  <div
-    class="modal fade"
-    id="productModal"
-    tabindex="-1"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
+  <div class="modal fade" tabindex="-1" ref="modalRef">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
 
         <div class="modal-header">
           <h5 class="modal-title">
-            {{ product && product.id ? "Editar Producto" : "Nuevo Producto" }}
+            {{ isEdit ? "Editar Producto" : "Nuevo Producto" }}
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
 
         <div class="modal-body">
 
-          <div class="mb-3">
-            <label class="form-label">Nombre</label>
-            <input v-model="form.title" type="text" class="form-control" />
-          </div>
+          <form>
+            <!-- Título -->
+            <div class="mb-3">
+              <label class="form-label">Título:</label>
+              <input v-model="form.title" type="text" class="form-control" />
+            </div>
 
-          <div class="mb-3">
-            <label class="form-label">Descripción</label>
-            <textarea v-model="form.description" class="form-control"></textarea>
-          </div>
+            <!-- Descripción -->
+            <div class="mb-3">
+              <label class="form-label">Descripción:</label>
+              <textarea v-model="form.description" class="form-control" rows="3"></textarea>
+            </div>
 
-          <div class="mb-3">
-            <label class="form-label">Precio</label>
-            <input v-model="form.price" type="number" class="form-control" />
-          </div>
+            <!-- Precio -->
+            <div class="mb-3">
+              <label class="form-label">Precio:</label>
+              <input v-model.number="form.price" type="number" class="form-control" />
+            </div>
 
-          <div class="mb-3">
-            <label class="form-label">Imagen (URL)</label>
-            <input v-model="form.image" type="text" class="form-control" />
-          </div>
+            <!-- Categoría -->
+            <div class="mb-3">
+              <label class="form-label">Categoría:</label>
+              <input v-model="form.category" type="text" class="form-control" />
+            </div>
 
-          <img
-            v-if="form.image"
-            :src="form.image"
-            class="img-fluid rounded border"
-            style="max-height: 150px; object-fit: cover;"
-          />
+            <!-- Imagen -->
+            <div class="mb-3">
+              <label class="form-label">URL Imagen:</label>
+              <input v-model="form.image" type="text" class="form-control" />
+            </div>
+
+            <!-- Stock -->
+            <div class="mb-3">
+              <label class="form-label">Stock:</label>
+              <input v-model.number="form.stock" type="number" class="form-control" />
+            </div>
+
+            <!-- Estado -->
+            <div class="mb-3">
+              <label class="form-label">Estado:</label>
+              <select v-model="form.status" class="form-select">
+                <option value="Disponible">Disponible</option>
+                <option value="Agotado">Agotado</option>
+              </select>
+            </div>
+
+          </form>
 
         </div>
 
@@ -60,37 +76,64 @@
 import { Modal } from "bootstrap";
 
 export default {
-  props: ["product"],
+  props: {
+    product: { type: Object, default: null }
+  },
 
   data() {
     return {
+      modal: null,
+
       form: {
         title: "",
         description: "",
-        price: "",
+        price: 0,
+        category: "",
         image: "",
+        stock: 0,
+        status: "Disponible",
       },
       modal: null
     };
   },
 
+  computed: {
+    isEdit() {
+      return !!this.product;
+    },
+  },
+
   watch: {
-    product(p) {
-      if (p) this.form = { ...p };
-      else {
-        this.form = {
-          title: "",
-          description: "",
-          price: "",
-          image: "",
-        };
-      }
-    }
+    product: {
+      immediate: true,
+      handler(val) {
+        if (val) {
+          this.form = {
+            title: val.title ?? "",
+            description: val.description ?? "",
+            price: val.price ?? 0,
+            category: val.category ?? "",
+            image: val.image ?? "",
+            stock: val.stock ?? 0,
+            status: val.status ?? "Disponible",
+          };
+        } else {
+          this.form = {
+            title: "",
+            description: "",
+            price: 0,
+            category: "",
+            image: "",
+            stock: 0,
+            status: "Disponible",
+          };
+        }
+      },
+    },
   },
 
   mounted() {
-    const modalEl = document.getElementById("productModal");
-    this.modal = new Modal(modalEl);
+    this.modal = new Modal(this.$refs.modalRef);
   },
 
   methods: {
@@ -98,10 +141,26 @@ export default {
       this.modal.show();
     },
 
-    guardar() {
-      this.$emit("save", this.form);
+    hide() {
       this.modal.hide();
-    }
-  }
+    },
+
+    guardar() {
+      if (!this.form.title || !this.form.price) {
+        alert("El título y el precio son obligatorios");
+        return;
+      }
+
+      this.$emit("save", { ...this.form });
+      this.hide();
+    },
+  },
 };
 </script>
+
+<style scoped>
+.modal-content {
+  border-radius: 12px;
+}
+</style>
+
