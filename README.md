@@ -1,217 +1,195 @@
-WichoFit – Sistema Web de Gestión para Gimnasio
 
-Aplicación web desarrollada con Vue.js 3 + Bootstrap 5.3
-Segundo Parcial – Desarrollo de Aplicaciones Web
+WichoFit
+Sistema de Gestión de Usuarios y Productos para Gimnasio y Suplementos Deportivos
 
-Descripción del Proyecto
+Descripción
+WichoFit es una Single Page Application desarrollada con Vue.js 3 y Bootstrap 5 que permite la gestión completa de usuarios y productos para establecimientos del sector fitness y suplementos deportivos. El sistema incluye autenticación, operaciones CRUD completas, modales interactivos y un diseño totalmente responsive.
+Este proyecto fue desarrollado como examen final del curso de Desarrollo de Aplicaciones Web y Sistemas Operativos.
 
-WichoFit es una aplicación web modular diseñada para la gestión interna de un gimnasio.
-Incluye autenticación básica, un panel de administración (Dashboard), y un módulo completo de gestión de productos utilizando una API externa.
+Características Principales
+Autenticación
 
-El objetivo del proyecto es demostrar:
+Sistema de login con validación de credenciales contra API
+Protección de rutas mediante Vue Router navigation guards
+Gestión de sesión con sessionStorage
+Funcionalidad de cierre de sesión
 
-Uso correcto de Vue 3
+Gestión de Usuarios
 
-Modularización con componentes, vistas, rutas
+Listado completo de usuarios en tabla responsive
+Creación de usuarios mediante modal con formulario
+Edición de información de usuarios existentes
+Eliminación de usuarios con modal de confirmación
+Sistema de alertas para operaciones exitosas y errores
 
-Consumo de APIs externas (FakeStore API mezclada con catálogo WichoFit)
+Gestión de Productos
 
-Estilos responsivos con Bootstrap 5.3
+Visualización de productos en grid de tarjetas
+Creación de productos con formulario completo
+Edición de productos existentes
+Eliminación de productos con confirmación
+Feedback visual mediante alertas de Bootstrap
 
-Buenas prácticas de desarrollo
+Interfaz de Usuario
 
-Colaboración mediante Git, ramas y Pull Requests
+Diseño moderno y profesional con Bootstrap 5
+Totalmente responsive
+Iconografía mediante Bootstrap Icons
+Componentes modales reutilizables
+Navbar con menú desplegable de usuario
+Sidebar de navegación lateral
+Footer informativo
 
- Paleta de Colores – WichoFit
 
-Usamos un estilo moderno basado en tonos energéticos de gimnasio:
+Tecnologías Utilizadas
+Frontend Framework
 
-#7F00FF → Morado principal
+Vue.js 3
+Vue Router 4
+Bootstrap 5
+Bootstrap Icons
+Axios
 
-#E100FF → Rosa acento
+Backend
 
-#0D0D0D → Fondo oscuro
+MockAPI
 
-#FFFFFF → Texto y contraste
+Herramientas de Desarrollo
 
-Integrados como clases personalizadas de Bootstrap para botones, títulos y barras laterales.
+Vite
+Git y GitHub
+Node.js y npm
 
-Funcionalidades Principales
- 1. Login con Validación Local
 
-Se incluye un archivo usuarios.json con usuarios de prueba.
-La aplicación valida:
+Estructura del Proyecto
+WichoFit/
+├── public/
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── views/
+│   ├── router/
+│   ├── services/
+│   ├── styles/
+│   ├── App.vue
+│   └── main.js
+├── .gitignore
+├── index.html
+├── package.json
+├── README.md
+└── vite.config.js
 
-✔ Usuario
-✔ Contraseña
+Instalación y Configuración
+Requisitos Previos
 
-Al iniciar sesión se guarda la sesión en sessionStorage.
+Node.js versión 16.0 o superior
+npm versión 7.0 o superior
+Git
 
-⚠ Nota: Este login es educativo. NO representa un sistema seguro.
+Pasos de Instalación
 
- 2. Dashboard Modular
+Clonar el repositorio
 
-Incluye:
+git clone https://github.com/usuario/wichofit.git
+cd wichofit
 
-NavbarComponent
+Instalar dependencias
 
-SidebarComponent
-
-FooterComponent
-
-Soporte para rutas hijas (/dashboard/productos, etc.)
-
-El Dashboard se mantiene estable mientras las vistas cambian mediante <router-view>.
-
- 3. Gestión de Productos (CRUD + API externa)
-
-WichoFit consume la API:
-
-https://fakestoreapi.com/products
-
-
-Y fusiona los resultados con un catálogo propio (gymProducts.js) para personalizar títulos, imágenes y descripciones.
-
-Funciones implementadas:
-
-Acción	Método	Estado
-Listar productos	GET	✔
-Crear productos	POST	✔ (simulado por FakeStore)
-Editar productos	PUT	✔
-Eliminar productos	DELETE	❗FakeStore no borra realmente, pero se simula
-
-Vista incluida:
-
-Tarjetas de producto (ProductCardComponent)
-
-Modal de edición/creación (ProductModal)
-
-Spinner de carga (LoadingSpinner)
-
- 4. Componentes Reutilizables
-✔ NavbarComponent
-
-Muestra el nombre del usuario logueado.
-
-✔ SidebarComponent
-
-Navegación lateral + estilo personalizado morado.
-
-✔ FooterComponent
-
-Pie de página.
-
-✔ ProductCardComponent
-
-Tarjeta Bootstrap con imagen, precio, descripción y botones.
-
-✔ ProductModal
-
-Modal con formulario para agregar/editar productos.
-
-📁 Estructura del Proyecto
-src/
-│── assets/
-│── components/
-│     ├── NavbarComponent.vue
-│     ├── SidebarComponent.vue
-│     ├── FooterComponent.vue
-│     ├── ProductCardComponent.vue
-│     ├── ProductModal.vue
-│     └── LoadingSpinner.vue
-│
-│── data/
-│     └── gymProducts.js
-│
-│── services/
-│     └── api.js
-│
-│── views/
-│     ├── LoginView.vue
-│     ├── DashboardView.vue
-│     └── ProductView.vue
-│
-│── router/
-│     └── index.js
-│
-└── App.vue
-
-🔗 Consumo de API – Ejemplo Real
-Obtener productos
-export async function getProducts() {
-  const res = await fetch('https://fakestoreapi.com/products')
-  return res.json()
-}
-Vista de Login (LoginView)
-
-La aplicación incluye una vista de inicio de sesión diseñada únicamente con fines educativos.
-El sistema valida las credenciales del usuario leyendo un archivo local usuarios.json, sin manejar cifrado ni autenticación real.
-
-✔ Funcionamiento
-
-El usuario ingresa su nombre de usuario y contraseña.
-
-El componente LoginView ejecuta una petición fetch() a usuarios.json.
-
-Se busca un usuario que coincida con las credenciales ingresadas.
-
-Si es correcto:
-
-La información del usuario se almacena temporalmente en sessionStorage.
-
-El usuario es redirigido al Dashboard.
-
-Si las credenciales son incorrectas:
-
-Se muestra una alerta Bootstrap usando el componente alert alert-danger.
-
- Ejemplo del archivo usuarios.json
-[
-  { "username": "admin", "password": "1234", "name": "Administrador" },
-  { "username": "user", "password": "abcd", "name": "Usuario Invitado" }
-]
-
- Código simplificado del LoginView
-<div v-if="alert" class="alert alert-danger" role="alert">
-  {{ alert }}
-</div>
-Este sistema de autenticación no representa un login real.
-Solo se usa para fines educativos como parte del parcial de Desarrollo de Aplicaciones Web.
-No implementa seguridad, cifrado ni protección de datos.
-
-Fusionar con Catálogo WichoFit
-this.productos = raw.map((p, i) => ({
-  ...p,
-  title: gymProducts[i]?.title || p.title,
-  description: gymProducts[i]?.description || p.description,
-  image: gymProducts[i]?.image || p.image,
-  category: "WichoFit Gym",
-}))
-
- Comunicación entre Componentes
-Props
-<ProductCardComponent :product="p" />
-
-Emisión de eventos
-this.$emit("delete", product)
-
- Trabajo Colaborativo con GitHub
-
-El repositorio evidencia:
-
-✔ Trabajo en ramas (rama-angel, rama-jhoan)
-✔ Fusiones mediante Pull Requests
-✔ Commits frecuentes
-✔ Convenciones de nombres
-✔ Corrección de errores en equipo (ej. conflicto de gymProducts.js)
-
- Usuario de Prueba (para Login)
-
-Credenciales sugeridas:
-
-Usuario: admin
-Contraseña: 123456
-
- Cómo ejecutar el proyecto
 npm install
-npm run serve
+
+Configurar endpoints de API
+Actualizar las URLs de MockAPI en los archivos de servicios ubicados en src/services/
+Ejecutar en modo desarrollo
+
+npm run dev
+La aplicación estará disponible en http://localhost:5173
+
+Compilar para producción
+
+npm run build
+
+Credenciales de Acceso
+Usuario: admin
+Contraseña: 1234
+
+Scripts Disponibles
+
+npm run dev: Inicia el servidor de desarrollo
+npm run build: Compila la aplicación para producción
+npm run preview: Previsualiza el build de producción
+
+
+Dependencias del Proyecto
+Producción
+
+vue 3.4.0
+vue-router 4.2.5
+axios 1.6.2
+bootstrap 5.3.2
+bootstrap-icons 1.11.2
+
+Desarrollo
+
+vitejs/plugin-vue 5.0.0
+vite 5.0.0
+
+
+Arquitectura de la Aplicación
+Patrón de Diseño
+
+Single Page Application
+Component-Based Architecture
+Separation of Concerns
+
+Gestión de Estado
+
+Estado local mediante Vue Composition API
+SessionStorage para persistencia de autenticación
+Props y Events para comunicación entre componentes
+
+
+API Endpoints
+Usuarios
+
+GET /users - Obtener todos los usuarios
+POST /users - Crear nuevo usuario
+PUT /users/:id - Actualizar usuario
+DELETE /users/:id - Eliminar usuario
+
+Productos
+
+GET /products - Obtener todos los productos
+POST /products - Crear nuevo producto
+PUT /products/:id - Actualizar producto
+DELETE /products/:id - Eliminar producto
+
+
+Funcionalidades Implementadas
+Sistema de Autenticación
+
+Login con validación
+Protección de rutas
+Persistencia de sesión
+Logout funcional
+
+Módulo de Usuarios
+
+Listado en tabla responsive
+Creación mediante modal
+Edición con pre-carga de datos
+Eliminación con confirmación
+Alertas de éxito y error
+
+Módulo de Productos
+
+Visualización en grid
+Creación mediante modal
+Edición con pre-carga de datos
+Eliminación con confirmación
+Sistema de alertas
+
+
+Autores
+Crhistian Angarita 192414
+Angel Sánchez 192411
+
