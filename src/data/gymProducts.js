@@ -1,3 +1,11 @@
+//
+// NOTA: Este archivo contiene datos de ejemplo de productos que fueron utilizados
+// durante el desarrollo inicial. Actualmente NO se utiliza en la aplicación.
+// Los productos ahora se gestionan completamente desde MockAPI.
+// Se mantiene comentado como referencia histórica del proyecto.
+//
+
+/*
 export const gymProducts = [
   {
     title: 'Proteína Whey WichoFit 2LB',
@@ -180,3 +188,6 @@ export const gymProducts = [
     price: 150000,
   },
 ]
+*/
+
+// FIN DEL ARCHIVO DE DATOS DE EJEMPLO
